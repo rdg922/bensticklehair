@@ -81,3 +81,22 @@ p {
   height: 100%;
 }
 
+.tool-button {
+  padding: 8px 12px;
+  margin: 5px;
+  border: 2px solid lightgray;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tool-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tool-button.active {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: white;
+}
+
