@@ -53,6 +53,16 @@ export default async function HallOfFamePage() {
                         </span>
                       </p>
                       <p className="text-lg mb-4">{ben.like_count} likes</p>
+                      {ben.birthday_message && (
+                        <div className="mb-4 p-3 bg-yellow-200 border-l-4 border-yellow-500 rounded">
+                          <p className="text-sm font-bold text-yellow-800 mb-1">
+                            🎂 BIRTHDAY MESSAGE:
+                          </p>
+                          <p className="text-sm text-yellow-900">
+                            {ben.birthday_message}
+                          </p>
+                        </div>
+                      )}
                       {ben.image_data && (
                         <img
                           src={ben.image_data || "/placeholder.svg"}

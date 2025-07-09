@@ -84,6 +84,7 @@ export async function createBenPost(formData: FormData) {
 
   const name = formData.get("name") as string;
   const imageData = formData.get("imageData") as string;
+  const birthdayMessage = formData.get("birthdayMessage") as string;
 
   if (!name?.trim()) {
     return { error: "Ben name is required" };
@@ -93,9 +94,14 @@ export async function createBenPost(formData: FormData) {
     return { error: "Image data is required" };
   }
 
+  if (!birthdayMessage?.trim()) {
+    return { error: "Birthday message is required" };
+  }
+
   const { error } = await supabase.from("bens").insert({
     name: name.trim(),
     image_data: imageData,
+    birthday_message: birthdayMessage.trim(),
     user_id: user.id,
   });
 

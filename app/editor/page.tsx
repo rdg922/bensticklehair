@@ -451,6 +451,14 @@ export default function EditorPage() {
                       required
                     />
 
+                    <textarea
+                      name="birthdayMessage"
+                      placeholder="Write a birthday message for Ben..."
+                      className="w-full p-3 text-lg resize-none"
+                      rows={3}
+                      required
+                    />
+
                     {benPostState &&
                       "error" in benPostState &&
                       benPostState.error && (

@@ -103,6 +103,14 @@ export function BenPost({ ben, userLikes = [] }: BenPostProps) {
         <p className="text-sm opacity-80">
           {new Date(ben.created_at).toLocaleDateString()}
         </p>
+        {ben.birthday_message && (
+          <div className="mt-3 p-3 bg-yellow-200 border-l-4 border-yellow-500 rounded">
+            <p className="text-sm font-bold text-yellow-800 mb-1">
+              🎂 BIRTHDAY MESSAGE:
+            </p>
+            <p className="text-sm text-yellow-900">{ben.birthday_message}</p>
+          </div>
+        )}
       </div>
 
       {ben.image_data && (

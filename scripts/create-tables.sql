@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS bens (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   image_data TEXT NOT NULL,
+  birthday_message TEXT NOT NULL,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
