@@ -1,0 +1,184 @@
+"use client";
+
+import {
+  useState,
+  useOptimistic,
+  useActionState,
+  startTransition,
+} from "react";
+import { dislikeBenPost, likeBenPost, addBenComment } from "@/lib/actions";
+
+interface BenPostProps {
+  ben: any;
+  userLikes?: string[];
+}
+
+export function BenPost({ ben, userLikes = [] }: BenPostProps) {
+  const [likes, setLikes] = useState(ben.ben_likes?.[0]?.count || 0);
+  const [hasLiked, setHasLiked] = useState(userLikes.includes(ben.id));
+  const [comments, setComments] = useState(ben.ben_comments || []);
+  const [commentState, commentAction, commentPending] = useActionState(
+    async (prevState: any, formData: FormData) => {
+      const content = formData.get("content") as string;
+      const result = await addBenComment(ben.id, content);
+
+      if (result.success) {
+        // Optimistically update comments
+        setComments((prev: any[]) => [
+          ...prev,
+          {
+            id: `temp-${Date.now()}`,
+            content,
+            users: { name: "You" },
+            created_at: new Date().toISOString(),
+          },
+        ]);
+
+        // Reset form
+        const form = document.querySelector(
+          `form[data-ben-id="${ben.id}"]`
+        ) as HTMLFormElement;
+        if (form) {
+          form.reset();
+        }
+
+        return { success: true };
+      }
+
+      return result;
+    },
+    null
+  );
+
+  const [optimisticLikes, updateOptimisticLikes] = useOptimistic(
+    { count: likes, hasLiked },
+    (state, action: "like" | "dislike") => {
+      if (action === "like" && !state.hasLiked) {
+        return { count: state.count + 1, hasLiked: true };
+      }
+      if (action == "dislike" && state.hasLiked) {
+        return { count: state.count - 1, hasLiked: false };
+      }
+      return state;
+    }
+  );
+
+  const handleLike = async () => {
+    const isCurrentlyLiked = optimisticLikes.hasLiked;
+    const action = isCurrentlyLiked ? "dislike" : "like";
+
+    // Optimistic update
+    startTransition(() => {
+      updateOptimisticLikes(action);
+    });
+
+    // Server call
+    const result = isCurrentlyLiked
+      ? await dislikeBenPost(ben.id)
+      : await likeBenPost(ben.id);
+
+    if (result.success) {
+      // Update real state
+      setLikes((prev: number) => (isCurrentlyLiked ? prev - 1 : prev + 1));
+      setHasLiked(!isCurrentlyLiked);
+    } else {
+      // Revert optimistic update on error
+      if (isCurrentlyLiked) {
+        setLikes(optimisticLikes.count + 1);
+        setHasLiked(true);
+      } else {
+        setLikes(optimisticLikes.count - 1);
+        setHasLiked(false);
+      }
+    }
+  };
+
+  return (
+    <div className="ben-post p-6">
+      <div className="mb-4">
+        <h3 className="text-2xl font-bold mb-2">{ben.name}</h3>
+        <p className="text-lg">
+          by <span className="glow-text">{ben.users?.name || "Anonymous"}</span>
+        </p>
+        <p className="text-sm opacity-80">
+          {new Date(ben.created_at).toLocaleDateString()}
+        </p>
+      </div>
+
+      {ben.image_data && (
+        <div className="mb-4 text-center">
+          <img
+            src={ben.image_data || "/placeholder.svg"}
+            alt={ben.name}
+            className="border-4 border-white max-w-sm mx-auto shadow-lg"
+          />
+        </div>
+      )}
+
+      <div className="flex items-center gap-4 mb-4">
+        <button
+          onClick={handleLike}
+          className={`btn-3d px-4 py-2 text-lg ${
+            optimisticLikes.hasLiked ? "btn-danger" : "btn-warning"
+          }`}
+        >
+          {optimisticLikes.count} LIKES
+        </button>
+      </div>
+
+      <div className="container-yellow p-4 w-full">
+        <form
+          action={commentAction}
+          className="flex gap-2 mb-3"
+          data-ben-id={ben.id}
+        >
+          <input
+            type="text"
+            name="content"
+            placeholder="Add a comment"
+            className="flex-1 p-2 text-sm"
+            required
+            disabled={commentPending}
+          />
+          <button
+            type="submit"
+            disabled={commentPending}
+            className="btn-3d btn-primary px-3 py-2 text-sm"
+          >
+            {commentPending ? "POSTING..." : "POST"}
+          </button>
+        </form>
+
+        {commentState && "error" in commentState && commentState.error && (
+          <div className="text-red-500 mb-2">{commentState.error}</div>
+        )}
+
+        {comments.length > 0 && (
+          <div className="space-y-2">
+            {comments.slice(0, 3).map((comment: any) => (
+              <div
+                key={comment.id}
+                className="bg-white p-2 border-l-4 border-purple-500"
+              >
+                <span className="font-bold text-purple-600">
+                  {comment.users?.name || "Anonymous"}:
+                </span>{" "}
+                <span className="text-gray-800">{comment.content}</span>
+              </div>
+            ))}
+            {comments.length > 3 && (
+              <div className="text-center">
+                <a
+                  href={`/ben/${ben.id}`}
+                  className="btn-3d btn-primary px-4 py-2 text-sm"
+                >
+                  View all {comments.length} comments
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
