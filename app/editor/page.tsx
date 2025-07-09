@@ -2,7 +2,13 @@
 
 import type React from "react";
 
-import { useState, useRef, useEffect, useActionState, useCallback } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useActionState,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase-client";
 import { createBenPost } from "@/lib/actions";
@@ -38,6 +44,7 @@ export default function EditorPage() {
   const [historyStep, setHistoryStep] = useState(-1);
   const [user, setUser] = useState<any>(null);
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
 
@@ -73,23 +80,39 @@ export default function EditorPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    setIsImageLoading(true);
+
     // Set canvas background to white first
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Show loading message
+    ctx.fillStyle = "#000000";
+    ctx.font = "20px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Loading Ben...", canvas.width / 2, canvas.height / 2);
+
     // Load and draw Ben.png as background
     const benImage = new Image();
     benImage.onload = () => {
-      // Draw the Ben image to fill the entire canvas
+      // Clear canvas and draw the Ben image to fill the entire canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(benImage, 0, 0, canvas.width, canvas.height);
+      setIsImageLoading(false);
       saveState();
     };
     benImage.onerror = () => {
-      // Fallback to simple Ben drawing if image fails to load
+      // Clear canvas and draw fallback
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       drawFallbackBen(ctx);
+      setIsImageLoading(false);
       saveState();
     };
-    benImage.src = "/Ben.png";
+    benImage.src = "/Ben.webp";
   };
 
   const drawFallbackBen = (ctx: CanvasRenderingContext2D) => {
@@ -132,7 +155,7 @@ export default function EditorPage() {
 
     let clientX: number, clientY: number;
 
-    if ('touches' in e) {
+    if ("touches" in e) {
       if (e.touches.length === 0) return null;
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
@@ -147,7 +170,13 @@ export default function EditorPage() {
     };
   };
 
-  const drawLine = (ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) => {
+  const drawLine = (
+    ctx: CanvasRenderingContext2D,
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number
+  ) => {
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
@@ -241,23 +270,39 @@ export default function EditorPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    setIsImageLoading(true);
+
     // Set canvas background to white first
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Show loading message
+    ctx.fillStyle = "#000000";
+    ctx.font = "20px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Loading Ben...", canvas.width / 2, canvas.height / 2);
+
     // Reload and draw Ben.png as background
     const benImage = new Image();
     benImage.onload = () => {
-      // Draw the Ben image to fill the entire canvas
+      // Clear canvas and draw the Ben image to fill the entire canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(benImage, 0, 0, canvas.width, canvas.height);
+      setIsImageLoading(false);
       saveState();
     };
     benImage.onerror = () => {
-      // Fallback to simple Ben drawing if image fails to load
+      // Clear canvas and draw fallback
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       drawFallbackBen(ctx);
+      setIsImageLoading(false);
       saveState();
     };
-    benImage.src = "/Ben.png";
+    benImage.src = "/Ben.webp";
   };
 
   // Prevent default touch behavior to avoid scrolling while drawing
@@ -286,7 +331,9 @@ export default function EditorPage() {
                       <button
                         key={color}
                         className={`w-6 h-6 border-2 border-black ${
-                          selectedColor === color ? "ring-2 ring-purple-500" : ""
+                          selectedColor === color
+                            ? "ring-2 ring-purple-500"
+                            : ""
                         }`}
                         style={{ backgroundColor: color }}
                         onClick={() => setSelectedColor(color)}
@@ -314,11 +361,11 @@ export default function EditorPage() {
                       </button>
                     ))}
                   </div>
-                  <div 
+                  <div
                     className="rounded-full bg-black ml-2"
-                    style={{ 
-                      width: `${Math.max(brushSize / 2, 3)}px`, 
-                      height: `${Math.max(brushSize / 2, 3)}px` 
+                    style={{
+                      width: `${Math.max(brushSize / 2, 3)}px`,
+                      height: `${Math.max(brushSize / 2, 3)}px`,
                     }}
                   />
                 </div>
@@ -346,8 +393,9 @@ export default function EditorPage() {
                   <button
                     onClick={clearCanvas}
                     className="btn-3d btn-danger px-3 py-1 text-sm"
+                    disabled={isImageLoading}
                   >
-                    CLEAR
+                    {isImageLoading ? "LOADING..." : "CLEAR"}
                   </button>
                 </div>
               </div>
@@ -358,28 +406,42 @@ export default function EditorPage() {
               <div className="lg:col-span-2">
                 <div className="container-pink p-6">
                   <div className="flex justify-center">
-                    <canvas
-                      ref={canvasRef}
-                      width={400}
-                      height={500}
-                      className="cursor-crosshair border-4 border-black bg-white"
-                      style={{ touchAction: 'none' }}
-                      onMouseDown={startDrawing}
-                      onMouseMove={draw}
-                      onMouseUp={stopDrawing}
-                      onMouseLeave={stopDrawing}
-                      onTouchStart={startDrawing}
-                      onTouchMove={draw}
-                      onTouchEnd={stopDrawing}
-                      onTouchCancel={stopDrawing}
-                    />
+                    <div className="relative">
+                      <canvas
+                        ref={canvasRef}
+                        width={400}
+                        height={500}
+                        className="cursor-crosshair border-4 border-black bg-white"
+                        style={{ touchAction: "none" }}
+                        onMouseDown={startDrawing}
+                        onMouseMove={draw}
+                        onMouseUp={stopDrawing}
+                        onMouseLeave={stopDrawing}
+                        onTouchStart={startDrawing}
+                        onTouchMove={draw}
+                        onTouchEnd={stopDrawing}
+                        onTouchCancel={stopDrawing}
+                      />
+                      {isImageLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 border-4 border-black">
+                          <div className="text-center">
+                            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-2"></div>
+                            <div className="font-bold text-lg">
+                              Loading Ben...
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
 
               <div className="lg:col-span-1">
                 <div className="container-90s p-6">
-                  <h3 className="text-lg font-bold mb-3 text-center">POST YOUR BEN</h3>
+                  <h3 className="text-lg font-bold mb-3 text-center">
+                    POST YOUR BEN
+                  </h3>
                   <form action={benPostAction} className="space-y-3">
                     <input
                       type="text"
