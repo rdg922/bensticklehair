@@ -9,12 +9,19 @@ import {
   useCallback,
   useRef,
 } from "react";
-import { dislikeBenPost, likeBenPost, addBenComment } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import {
+  dislikeBenPost,
+  likeBenPost,
+  addBenComment,
+  deleteBenPost,
+} from "@/lib/actions";
 import { createClient } from "@/lib/supabase-client";
 
 interface BenDetailViewProps {
   ben: any;
   userLikes?: string[];
+  currentUserId?: string;
 }
 
 interface Comment {
@@ -24,13 +31,19 @@ interface Comment {
   created_at: string;
 }
 
-export function BenDetailView({ ben, userLikes = [] }: BenDetailViewProps) {
+export function BenDetailView({
+  ben,
+  userLikes = [],
+  currentUserId,
+}: BenDetailViewProps) {
+  const router = useRouter();
   const [likes, setLikes] = useState(ben.ben_likes?.[0]?.count || 0);
   const [hasLiked, setHasLiked] = useState(userLikes.includes(ben.id));
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
 
   const [commentState, commentAction, commentPending] = useActionState(
@@ -171,6 +184,34 @@ export function BenDetailView({ ben, userLikes = [] }: BenDetailViewProps) {
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this Ben post? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      const result = await deleteBenPost(ben.id);
+
+      if (result.success) {
+        // Redirect to home page after successful deletion
+        router.push("/");
+      } else {
+        alert(result.error || "Failed to delete post");
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("An unexpected error occurred while deleting the post");
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="ben-post p-6 bg-white rounded-lg shadow-lg">
       {/* Back button */}
@@ -215,6 +256,16 @@ export function BenDetailView({ ben, userLikes = [] }: BenDetailViewProps) {
         >
           {optimisticLikes.count} LIKES
         </button>
+
+        {currentUserId === ben.user_id && (
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="btn-3d btn-danger px-6 py-3 text-xl"
+          >
+            {isDeleting ? "DELETING..." : "DELETE"}
+          </button>
+        )}
       </div>
 
       {/* Comments section */}

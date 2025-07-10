@@ -5,10 +5,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-4">
-        <SiteHeader
-          marqueeText="SIGN IN TO START YOUR BEN DRAWING JOURNEY"
-          currentPage={undefined}
-        />
+        <SiteHeader currentPage={undefined} />
 
         <main>
           <div className="max-w-md mx-auto">

@@ -313,10 +313,7 @@ export default function EditorPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-4">
-        <SiteHeader
-          marqueeText="UNLEASH YOUR CREATIVITY - DRAW THE MOST EPIC BEN EVER"
-          currentPage="editor"
-        />
+        <SiteHeader currentPage="editor" />
 
         <main>
           <div className="space-y-4">

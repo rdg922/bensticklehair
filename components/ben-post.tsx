@@ -6,17 +6,26 @@ import {
   useActionState,
   startTransition,
 } from "react";
-import { dislikeBenPost, likeBenPost, addBenComment } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import {
+  dislikeBenPost,
+  likeBenPost,
+  addBenComment,
+  deleteBenPost,
+} from "@/lib/actions";
 
 interface BenPostProps {
   ben: any;
   userLikes?: string[];
+  currentUserId?: string;
 }
 
-export function BenPost({ ben, userLikes = [] }: BenPostProps) {
+export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
+  const router = useRouter();
   const [likes, setLikes] = useState(ben.ben_likes?.[0]?.count || 0);
   const [hasLiked, setHasLiked] = useState(userLikes.includes(ben.id));
   const [comments, setComments] = useState(ben.ben_comments || []);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [commentState, commentAction, commentPending] = useActionState(
     async (prevState: any, formData: FormData) => {
       const content = formData.get("content") as string;
@@ -93,6 +102,34 @@ export function BenPost({ ben, userLikes = [] }: BenPostProps) {
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this Ben post? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      const result = await deleteBenPost(ben.id);
+
+      if (result.success) {
+        // Use router refresh instead of window.location.reload for better UX
+        router.refresh();
+      } else {
+        alert(result.error || "Failed to delete post");
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("An unexpected error occurred while deleting the post");
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="ben-post p-6">
       <div className="mb-4">
@@ -132,6 +169,16 @@ export function BenPost({ ben, userLikes = [] }: BenPostProps) {
         >
           {optimisticLikes.count} LIKES
         </button>
+
+        {currentUserId === ben.user_id && (
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="btn-3d btn-danger px-4 py-2 text-lg"
+          >
+            {isDeleting ? "DELETING..." : "DELETE"}
+          </button>
+        )}
       </div>
 
       <div className="container-yellow p-4 w-full">

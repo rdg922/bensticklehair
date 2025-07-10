@@ -8,10 +8,7 @@ export default async function HallOfFamePage() {
     return (
       <div className="min-h-screen">
         <div className="max-w-6xl mx-auto p-4">
-          <SiteHeader
-            marqueeText="THE MOST EPIC BENS OF ALL TIME - LEGENDS NEVER DIE"
-            currentPage="hall-of-fame"
-          />
+          <SiteHeader currentPage="hall-of-fame" />
           <main>
             <div className="container-yellow p-8 text-center">
               <h3 className="text-3xl font-bold mb-4">
@@ -30,10 +27,7 @@ export default async function HallOfFamePage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-4">
-        <SiteHeader
-          marqueeText="THE MOST EPIC BENS OF ALL TIME - LEGENDS NEVER DIE"
-          currentPage="hall-of-fame"
-        />
+        <SiteHeader currentPage="hall-of-fame" />
 
         <main>
           {topBens && topBens.length > 0 ? (

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { AccountForm } from "@/components/account-form";
+import { AccountBenItem } from "@/components/account-ben-item";
 import { SiteHeader } from "@/components/site-header";
 
 export default async function AccountPage() {
@@ -29,10 +30,7 @@ export default async function AccountPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-4">
-        <SiteHeader
-          marqueeText="MANAGE YOUR LEGENDARY BEN COLLECTION"
-          currentPage="account"
-        />
+        <SiteHeader currentPage="account" />
 
         <main>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -41,31 +39,11 @@ export default async function AccountPage() {
             </div>
 
             <div className="container-green p-6">
+              <h2 className="text-2xl font-bold mb-4 text-white">YOUR BENS</h2>
               {userBens && userBens.length > 0 ? (
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {userBens.map((ben) => (
-                    <div
-                      key={ben.id}
-                      className="bg-white p-3 border-4 border-purple-400"
-                    >
-                      <div className="flex items-center gap-3">
-                        {ben.image_data && (
-                          <img
-                            src={ben.image_data || "/placeholder.svg"}
-                            alt={ben.name}
-                            className="w-16 h-20 border-2 border-gray-400 object-cover"
-                          />
-                        )}
-                        <div>
-                          <p className="font-bold text-lg text-purple-600">
-                            {ben.name}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {new Date(ben.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    <AccountBenItem key={ben.id} ben={ben} />
                   ))}
                 </div>
               ) : (

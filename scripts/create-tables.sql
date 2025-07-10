@@ -46,9 +46,12 @@ CREATE POLICY "Users can update own profile" ON users FOR UPDATE USING (auth.uid
 CREATE POLICY "Anyone can view bens" ON bens FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can create bens" ON bens FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "Users can update own bens" ON bens FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own bens" ON bens FOR DELETE USING (auth.uid() = user_id);
 
 CREATE POLICY "Anyone can view likes" ON ben_likes FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can like bens" ON ben_likes FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Users can delete own likes" ON ben_likes FOR DELETE USING (auth.uid() = user_id);
 
 CREATE POLICY "Anyone can view comments" ON ben_comments FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can comment" ON ben_comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Users can delete own comments" ON ben_comments FOR DELETE USING (auth.uid() = user_id);

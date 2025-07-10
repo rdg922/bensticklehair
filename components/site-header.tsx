@@ -1,9 +1,8 @@
 interface SiteHeaderProps {
-  marqueeText: string;
   currentPage?: "home" | "editor" | "hall-of-fame" | "account";
 }
 
-export function SiteHeader({ marqueeText, currentPage }: SiteHeaderProps) {
+export function SiteHeader({ currentPage }: SiteHeaderProps) {
   const getNavLinkClass = (page: string) => {
     const baseClass = "text-2xl";
     return currentPage === page
@@ -13,10 +12,10 @@ export function SiteHeader({ marqueeText, currentPage }: SiteHeaderProps) {
 
   return (
     <header className="container-90s p-6 mb-8">
-      <h1 className="text-6xl font-bold mb-4 rainbow-text text-center">
-        ✨ benstickle.hair✨
+      <h1 className="text-3xl md:text-6xl font-bold mb-4 rainbow-text text-center">
+        ✨benjaminstickle.hair✨
       </h1>
-      <div className="marquee text-center mb-4">{marqueeText}</div>
+      <div className="marquee text-center mb-4">LIFE IS BEAUTIFUL</div>
       <nav className="text-center space-x-6">
         <a href="/" className={getNavLinkClass("home")}>
           HOME

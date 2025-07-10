@@ -4,10 +4,7 @@ export default function AuthCodeError() {
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-4">
-        <SiteHeader
-          marqueeText="AUTHENTICATION ERROR - PLEASE TRY AGAIN"
-          currentPage={undefined}
-        />
+        <SiteHeader currentPage={undefined} />
 
         <main>
           <div className="max-w-md mx-auto">

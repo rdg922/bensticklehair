@@ -251,3 +251,51 @@ export async function getHallOfFameBens() {
 
   return { success: true, data: bensWithLikes };
 }
+
+export async function deleteBenPost(benId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Must be logged in to delete posts" };
+  }
+
+  // First check if the user owns this ben
+  const { data: ben, error: fetchError } = await supabase
+    .from("bens")
+    .select("user_id")
+    .eq("id", benId)
+    .single();
+
+  if (fetchError || !ben) {
+    console.error("Error fetching ben for deletion:", fetchError);
+    return { error: "Ben post not found" };
+  }
+
+  if (ben.user_id !== user.id) {
+    return { error: "You can only delete your own posts" };
+  }
+
+  // Delete the ben post - cascade deletion will handle likes and comments
+  const { error } = await supabase
+    .from("bens")
+    .delete()
+    .eq("id", benId)
+    .eq("user_id", user.id); // Extra safety check
+
+  if (error) {
+    console.error("Error deleting ben post:", error);
+    return { error: "Failed to delete ben post" };
+  }
+
+  // Add a small delay to ensure database changes are committed
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  revalidatePath("/");
+  revalidatePath("/account");
+  revalidatePath(`/ben/${benId}`);
+  return { success: true };
+}

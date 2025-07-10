@@ -38,7 +38,7 @@ async function getUserLikes() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return [];
+    return { likes: [], userId: null };
   }
 
   const { data: likes } = await supabase
@@ -46,7 +46,10 @@ async function getUserLikes() {
     .select("ben_id")
     .eq("user_id", user.id);
 
-  return likes?.map((like) => like.ben_id) || [];
+  return {
+    likes: likes?.map((like) => like.ben_id) || [],
+    userId: user.id,
+  };
 }
 
 export default async function BenPage({ params }: BenPageProps) {
@@ -56,13 +59,17 @@ export default async function BenPage({ params }: BenPageProps) {
     notFound();
   }
 
-  const userLikes = await getUserLikes();
+  const { likes: userLikes, userId: currentUserId } = await getUserLikes();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <BenDetailView ben={ben} userLikes={userLikes} />
+          <BenDetailView
+            ben={ben}
+            userLikes={userLikes}
+            currentUserId={currentUserId}
+          />
         </div>
       </div>
     </div>
