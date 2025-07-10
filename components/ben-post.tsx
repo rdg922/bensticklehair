@@ -26,6 +26,7 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
   const [hasLiked, setHasLiked] = useState(userLikes.includes(ben.id));
   const [comments, setComments] = useState(ben.ben_comments || []);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isShared, setIsShared] = useState(false);
   const [commentState, commentAction, commentPending] = useActionState(
     async (prevState: any, formData: FormData) => {
       const content = formData.get("content") as string;
@@ -130,6 +131,24 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const shareUrl = `${window.location.origin}/ben/${ben.id}`;
+      await navigator.clipboard.writeText(shareUrl);
+
+      setIsShared(true);
+
+      // Reset the text after 2 seconds
+      setTimeout(() => {
+        setIsShared(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to copy to clipboard:", error);
+      // Fallback for browsers that don't support clipboard API
+      alert("Failed to copy link. Please copy the URL manually.");
+    }
+  };
+
   return (
     <div className="ben-post p-6">
       <div className="mb-4">
@@ -168,6 +187,13 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
           }`}
         >
           {optimisticLikes.count} LIKES
+        </button>
+
+        <button
+          onClick={handleShare}
+          className="btn-3d btn-primary px-4 py-2 text-lg"
+        >
+          {isShared ? "COPIED LINK!" : "SHARE"}
         </button>
 
         {currentUserId === ben.user_id && (
