@@ -31,40 +31,46 @@ export default async function HallOfFamePage() {
 
         <main>
           {topBens && topBens.length > 0 ? (
-            <div className="space-y-6">
+            <div className="grid grid-cols-5 gap-6">
               {topBens.map((ben, index) => (
-                <div key={ben.id} className="hall-of-fame-item p-6">
-                  <div className="flex items-start gap-6">
-                    <div className="text-center">
-                      <div className="rank-number text-6xl">#{index + 1}</div>
+                <div key={ben.id} className="hall-of-fame-item p-4">
+                  <div className="text-center mb-3">
+                    <div className="rank-number text-4xl font-bold">
+                      #{index + 1}
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-3xl font-bold mb-2">{ben.name}</h3>
-                      <p className="text-xl mb-2">
-                        by{" "}
-                        <span className="font-bold">
-                          {ben.users?.name || "Anonymous"}
-                        </span>
-                      </p>
-                      <p className="text-lg mb-4">{ben.like_count} likes</p>
-                      {ben.birthday_message && (
-                        <div className="mb-4 p-3 bg-yellow-200 border-l-4 border-yellow-500 rounded">
-                          <p className="text-sm font-bold text-yellow-800 mb-1">
-                            🎂 BIRTHDAY MESSAGE:
-                          </p>
-                          <p className="text-sm text-yellow-900">
-                            {ben.birthday_message}
-                          </p>
-                        </div>
-                      )}
-                      {ben.image_data && (
-                        <img
-                          src={ben.image_data || "/placeholder.svg"}
-                          alt={ben.name}
-                          className="border-4 border-purple-500 max-w-xs shadow-lg"
-                        />
-                      )}
+                  </div>
+                  {ben.image_data && (
+                    <div className="flex-1 flex items-center justify-center">
+                      <img
+                        src={ben.image_data || "/placeholder.svg"}
+                        alt={ben.name}
+                        className="border-4 border-purple-500 w-full h-auto max-w-full shadow-lg"
+                      />
                     </div>
+                  )}
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="text-xl font-bold mb-2 text-center">
+                      {ben.name}
+                    </h3>
+                    <p className="text-sm mb-2 text-center">
+                      by{" "}
+                      <span className="font-bold">
+                        {ben.users?.name || "Anonymous"}
+                      </span>
+                    </p>
+                    <p className="text-sm mb-3 text-center font-semibold">
+                      {ben.like_count} likes
+                    </p>
+                    {ben.birthday_message && (
+                      <div className="mb-3 p-2 bg-yellow-200 border-l-4 border-yellow-500 rounded text-xs">
+                        <p className="font-bold text-yellow-800 mb-1">
+                          🎂 BIRTHDAY MESSAGE:
+                        </p>
+                        <p className="text-yellow-900">
+                          {ben.birthday_message}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
