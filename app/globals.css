@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: "Comic Sans MS", cursive;
+  font-family: "Comic Sans MS";
   background: linear-gradient(45deg, #000033, #000066, #003366, #000033);
   background-size: 400% 400%;
   animation: gradientShift 8s ease-in-out infinite;
@@ -51,7 +51,7 @@ body::before {
 
 /* 3D Button Styles */
 .btn-3d {
-  font-family: "Comic Sans MS", cursive;
+  font-family: "Comic Sans MS";
   font-weight: bold;
   text-transform: uppercase;
   border: none;
@@ -189,7 +189,7 @@ body::before {
 /* Input styling */
 input,
 textarea {
-  font-family: "Comic Sans MS", cursive;
+  font-family: "Comic Sans MS";
   background: #ffe4e1;
   border: 3px solid;
   border-top-color: #fff0f5;
