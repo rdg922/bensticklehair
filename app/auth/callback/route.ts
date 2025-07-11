@@ -17,12 +17,9 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error("OAuth callback error:", error, errorDescription);
-    const errorUrl = new URL(`${origin}/auth/auth-code-error`);
-    errorUrl.searchParams.set("error", error);
-    if (next !== "/") {
-      errorUrl.searchParams.set("redirect", next);
-    }
-    return NextResponse.redirect(errorUrl.toString());
+    return NextResponse.redirect(
+      `${origin}/auth/auth-code-error?error=${encodeURIComponent(error)}`
+    );
   }
 
   if (code) {
@@ -62,21 +59,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}${next}`);
     } else {
       console.error("Code exchange error:", exchangeError);
-      const errorUrl = new URL(`${origin}/auth/auth-code-error`);
-      errorUrl.searchParams.set("error", "exchange_failed");
-      if (next !== "/") {
-        errorUrl.searchParams.set("redirect", next);
-      }
-      return NextResponse.redirect(errorUrl.toString());
+      return NextResponse.redirect(
+        `${origin}/auth/auth-code-error?error=exchange_failed`
+      );
     }
   }
 
   console.error("No authorization code received");
   // Return the user to an error page with instructions
-  const errorUrl = new URL(`${origin}/auth/auth-code-error`);
-  errorUrl.searchParams.set("error", "no_code");
-  if (next !== "/") {
-    errorUrl.searchParams.set("redirect", next);
-  }
-  return NextResponse.redirect(errorUrl.toString());
+  return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code`);
 }

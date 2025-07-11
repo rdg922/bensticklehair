@@ -13,15 +13,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: [
-          '"Comic Sans MS"',
-          '"Comic Sans"',
-          "Chalkduster",
-          '"Bradley Hand"',
-          '"Brush Script MT"',
-          "cursive",
-          "sans-serif",
-        ],
+        sans: ['"Comic Sans MS"', "cursive"],
       },
       colors: {
         background: "hsl(var(--background))",
