@@ -4,14 +4,19 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(redirectTo?: string) {
   const supabase = await createClient();
 
   // Validate environment variables
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const redirectUrl = siteUrl
+  const baseRedirectUrl = siteUrl
     ? `${siteUrl}/auth/callback`
     : "http://localhost:3000/auth/callback";
+
+  // Include the redirect destination in the callback URL
+  const redirectUrl = redirectTo
+    ? `${baseRedirectUrl}?next=${encodeURIComponent(redirectTo)}`
+    : baseRedirectUrl;
 
   console.log("Sign in attempt with redirect URL:", redirectUrl);
 

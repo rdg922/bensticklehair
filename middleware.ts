@@ -53,8 +53,11 @@ export async function middleware(request: NextRequest) {
     );
 
     // no user, potentially respond by redirecting the user to the login page
+    // Include the original URL as a query parameter so we can redirect back after login
     const url = request.nextUrl.clone();
+    const redirectTo = request.nextUrl.pathname + request.nextUrl.search;
     url.pathname = "/login";
+    url.searchParams.set("redirect", redirectTo);
     return NextResponse.redirect(url);
   }
 

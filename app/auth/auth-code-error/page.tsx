@@ -1,6 +1,17 @@
 import { SiteHeader } from "@/components/site-header";
 
-export default function AuthCodeError() {
+interface AuthCodeErrorProps {
+  searchParams: Promise<{ error?: string; redirect?: string }>;
+}
+
+export default async function AuthCodeError({
+  searchParams,
+}: AuthCodeErrorProps) {
+  const { error, redirect } = await searchParams;
+  const loginUrl = redirect
+    ? `/login?redirect=${encodeURIComponent(redirect)}`
+    : "/login";
+
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto p-4">
@@ -16,7 +27,7 @@ export default function AuthCodeError() {
                 Sorry, there was an error signing you in. Please try again.
               </p>
               <a
-                href="/login"
+                href={loginUrl}
                 className="btn-3d btn-primary px-6 py-3 text-xl inline-block"
               >
                 TRY AGAIN
