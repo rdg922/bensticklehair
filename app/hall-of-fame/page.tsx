@@ -111,13 +111,18 @@ export default function HallOfFamePage() {
                         `}
                         style={{
                           fontFamily: "monospace",
-                          background: currentIndex === 0 ? "#808080" : "#00FF00",
+                          background:
+                            currentIndex === 0 ? "#808080" : "#00FF00",
                           color: currentIndex === 0 ? "#C0C0C0" : "#000000",
                           border: "4px solid",
-                          borderTopColor: currentIndex === 0 ? "#A0A0A0" : "#40FF40",
-                          borderLeftColor: currentIndex === 0 ? "#A0A0A0" : "#40FF40",
-                          borderRightColor: currentIndex === 0 ? "#606060" : "#00CC00",
-                          borderBottomColor: currentIndex === 0 ? "#606060" : "#00CC00",
+                          borderTopColor:
+                            currentIndex === 0 ? "#A0A0A0" : "#40FF40",
+                          borderLeftColor:
+                            currentIndex === 0 ? "#A0A0A0" : "#40FF40",
+                          borderRightColor:
+                            currentIndex === 0 ? "#606060" : "#00CC00",
+                          borderBottomColor:
+                            currentIndex === 0 ? "#606060" : "#00CC00",
                           boxShadow: "2px 2px 0px rgba(0, 0, 0, 0.3)",
                         }}
                       >
@@ -154,10 +159,22 @@ export default function HallOfFamePage() {
                               ? "#C0C0C0"
                               : "#000000",
                           border: "4px solid",
-                          borderTopColor: (!mobileBens || currentIndex >= mobileBens.length - 1) ? "#A0A0A0" : "#40FF40",
-                          borderLeftColor: (!mobileBens || currentIndex >= mobileBens.length - 1) ? "#A0A0A0" : "#40FF40",
-                          borderRightColor: (!mobileBens || currentIndex >= mobileBens.length - 1) ? "#606060" : "#00CC00",
-                          borderBottomColor: (!mobileBens || currentIndex >= mobileBens.length - 1) ? "#606060" : "#00CC00",
+                          borderTopColor:
+                            !mobileBens || currentIndex >= mobileBens.length - 1
+                              ? "#A0A0A0"
+                              : "#40FF40",
+                          borderLeftColor:
+                            !mobileBens || currentIndex >= mobileBens.length - 1
+                              ? "#A0A0A0"
+                              : "#40FF40",
+                          borderRightColor:
+                            !mobileBens || currentIndex >= mobileBens.length - 1
+                              ? "#606060"
+                              : "#00CC00",
+                          borderBottomColor:
+                            !mobileBens || currentIndex >= mobileBens.length - 1
+                              ? "#606060"
+                              : "#00CC00",
                           boxShadow: "2px 2px 0px rgba(0, 0, 0, 0.3)",
                         }}
                       >
@@ -223,7 +240,7 @@ export default function HallOfFamePage() {
                               background: "#4facfe",
                               border: "4px solid",
                               borderTopColor: "#7fc7ff",
-                              borderLeftColor: "#7fc7ff", 
+                              borderLeftColor: "#7fc7ff",
                               borderRightColor: "#0066cc",
                               borderBottomColor: "#0066cc",
                               color: "#2c3e50",
@@ -294,7 +311,7 @@ export default function HallOfFamePage() {
                               background: "#4facfe",
                               border: "4px solid",
                               borderTopColor: "#7fc7ff",
-                              borderLeftColor: "#7fc7ff", 
+                              borderLeftColor: "#7fc7ff",
                               borderRightColor: "#0066cc",
                               borderBottomColor: "#0066cc",
                               color: "#2c3e50",

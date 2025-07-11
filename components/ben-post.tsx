@@ -27,6 +27,7 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
   const [comments, setComments] = useState(ben.ben_comments || []);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isShared, setIsShared] = useState(false);
+  const [isLiking, setIsLiking] = useState(false); // Add debouncing state
   const [commentState, commentAction, commentPending] = useActionState(
     async (prevState: any, formData: FormData) => {
       const content = formData.get("content") as string;
@@ -64,16 +65,29 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
     { count: likes, hasLiked },
     (state, action: "like" | "dislike") => {
       if (action === "like" && !state.hasLiked) {
-        return { count: state.count + 1, hasLiked: true };
+        return { count: Math.max(0, state.count + 1), hasLiked: true };
       }
-      if (action == "dislike" && state.hasLiked) {
-        return { count: state.count - 1, hasLiked: false };
+      if (action === "dislike" && state.hasLiked) {
+        return { count: Math.max(0, state.count - 1), hasLiked: false };
       }
       return state;
     }
   );
 
   const handleLike = async () => {
+    // Check if user is authenticated
+    if (!currentUserId) {
+      alert("Please sign in to like posts!");
+      return;
+    }
+
+    // Prevent spam clicking
+    if (isLiking) {
+      return;
+    }
+
+    setIsLiking(true);
+
     const isCurrentlyLiked = optimisticLikes.hasLiked;
     const action = isCurrentlyLiked ? "dislike" : "like";
 
@@ -82,24 +96,41 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
       updateOptimisticLikes(action);
     });
 
-    // Server call
-    const result = isCurrentlyLiked
-      ? await dislikeBenPost(ben.id)
-      : await likeBenPost(ben.id);
+    try {
+      // Server call
+      const result = isCurrentlyLiked
+        ? await dislikeBenPost(ben.id)
+        : await likeBenPost(ben.id);
 
-    if (result.success) {
-      // Update real state
-      setLikes((prev: number) => (isCurrentlyLiked ? prev - 1 : prev + 1));
-      setHasLiked(!isCurrentlyLiked);
-    } else {
+      if (result.success) {
+        // Update real state
+        setLikes((prev: number) =>
+          Math.max(0, isCurrentlyLiked ? prev - 1 : prev + 1)
+        );
+        setHasLiked(!isCurrentlyLiked);
+      } else {
+        // Revert optimistic update on error
+        if (isCurrentlyLiked) {
+          setLikes((prev) => Math.max(0, prev + 1));
+          setHasLiked(true);
+        } else {
+          setLikes((prev) => Math.max(0, prev - 1));
+          setHasLiked(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
       // Revert optimistic update on error
       if (isCurrentlyLiked) {
-        setLikes(optimisticLikes.count + 1);
+        setLikes((prev) => Math.max(0, prev + 1));
         setHasLiked(true);
       } else {
-        setLikes(optimisticLikes.count - 1);
+        setLikes((prev) => Math.max(0, prev - 1));
         setHasLiked(false);
       }
+    } finally {
+      // Re-enable button after a short delay
+      setTimeout(() => setIsLiking(false), 500);
     }
   };
 
@@ -182,11 +213,15 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
       <div className="flex items-center gap-4 mb-4">
         <button
           onClick={handleLike}
+          disabled={isLiking || !currentUserId}
           className={`btn-3d px-4 py-2 text-lg ${
             optimisticLikes.hasLiked ? "btn-danger" : "btn-warning"
+          } ${
+            !currentUserId || isLiking ? "opacity-50 cursor-not-allowed" : ""
           }`}
+          title={!currentUserId ? "Sign in to like posts" : ""}
         >
-          {optimisticLikes.count} LIKES
+          {optimisticLikes.count} LIKES {isLiking ? "..." : ""}
         </button>
 
         <button
