@@ -4,7 +4,7 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ currentPage }: SiteHeaderProps) {
   const getNavLinkClass = (page: string) => {
-    const baseClass = "text-md whitespace-break-spaces";
+    const baseClass = "text-md md:text-xl whitespace-break-spaces";
     return currentPage === page
       ? `${baseClass} font-bold glow-text`
       : baseClass;
