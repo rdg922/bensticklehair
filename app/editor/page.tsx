@@ -46,6 +46,8 @@ export default function EditorPage() {
   const [userLoaded, setUserLoaded] = useState(false);
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const [benName, setBenName] = useState("");
+  const [birthdayMessage, setBirthdayMessage] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
@@ -484,27 +486,69 @@ export default function EditorPage() {
                   )}
 
                   <form action={benPostAction} className="space-y-3">
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Name your Ben"
-                      className={`w-full p-3 text-base lg:text-lg ${
-                        !user ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                      required
-                      disabled={!user}
-                    />
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-sm font-bold">BEN NAME</label>
+                        <span
+                          className={`text-xs ${
+                            benName.length > 50
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {benName.length}/50
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Name your Ben"
+                        value={benName}
+                        onChange={(e) =>
+                          setBenName(e.target.value.slice(0, 50))
+                        }
+                        className={`w-full p-3 text-base lg:text-lg ${
+                          !user ? "opacity-50 cursor-not-allowed" : ""
+                        } ${benName.length > 50 ? "border-red-500" : ""}`}
+                        required
+                        disabled={!user}
+                        maxLength={50}
+                      />
+                    </div>
 
-                    <textarea
-                      name="birthdayMessage"
-                      placeholder="Write a birthday message for Ben..."
-                      className={`w-full p-3 text-base lg:text-lg resize-none ${
-                        !user ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                      rows={3}
-                      required
-                      disabled={!user}
-                    />
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="text-sm font-bold">
+                          BIRTHDAY MESSAGE
+                        </label>
+                        <span
+                          className={`text-xs ${
+                            birthdayMessage.length > 240
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {birthdayMessage.length}/240
+                        </span>
+                      </div>
+                      <textarea
+                        name="birthdayMessage"
+                        placeholder="Write a birthday message for Ben..."
+                        value={birthdayMessage}
+                        onChange={(e) =>
+                          setBirthdayMessage(e.target.value.slice(0, 240))
+                        }
+                        className={`w-full p-3 text-base lg:text-lg resize-none ${
+                          !user ? "opacity-50 cursor-not-allowed" : ""
+                        } ${
+                          birthdayMessage.length > 240 ? "border-red-500" : ""
+                        }`}
+                        rows={3}
+                        required
+                        disabled={!user}
+                        maxLength={240}
+                      />
+                    </div>
 
                     {benPostState &&
                       "error" in benPostState &&

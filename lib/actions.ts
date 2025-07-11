@@ -104,12 +104,20 @@ export async function createBenPost(formData: FormData) {
     return { error: "Ben name is required" };
   }
 
+  if (name.trim().length > 50) {
+    return { error: "Ben name must be 50 characters or less" };
+  }
+
   if (!imageData) {
     return { error: "Image data is required" };
   }
 
   if (!birthdayMessage?.trim()) {
     return { error: "Birthday message is required" };
+  }
+
+  if (birthdayMessage.trim().length > 240) {
+    return { error: "Birthday message must be 240 characters or less" };
   }
 
   const { error } = await supabase.from("bens").insert({
