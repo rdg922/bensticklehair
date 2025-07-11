@@ -269,7 +269,7 @@ export async function getHallOfFameBens() {
     }))
     .filter((ben: any) => ben.like_count > 0) // Only show bens with likes
     .sort((a: any, b: any) => b.like_count - a.like_count)
-    .slice(0, 5); // Top 10
+    .slice(0, 5); // Top 5
 
   return { success: true, data: bensWithLikes };
 }

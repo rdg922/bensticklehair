@@ -105,7 +105,7 @@ export function BenDetailView({
           `
           )
           .eq("ben_id", ben.id)
-          .order("created_at", { ascending: false })
+          .order("created_at", { ascending: true })
           .range(pageNum * 10, pageNum * 10 + 9);
 
         if (error) {
