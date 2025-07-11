@@ -4,7 +4,7 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ currentPage }: SiteHeaderProps) {
   const getNavLinkClass = (page: string) => {
-    const baseClass = "text-2xl";
+    const baseClass = "text-md whitespace-break-spaces";
     return currentPage === page
       ? `${baseClass} font-bold glow-text`
       : baseClass;
@@ -12,7 +12,7 @@ export function SiteHeader({ currentPage }: SiteHeaderProps) {
 
   return (
     <header className="container-90s p-6 mb-8">
-      <h1 className="text-3xl md:text-6xl font-bold mb-4 rainbow-text text-center">
+      <h1 className="text-2xl md:text-6xl font-bold mb-4 rainbow-text text-center">
         ✨benjaminstickle.hair✨
       </h1>
       <div className="marquee text-center mb-4">LIFE IS BEAUTIFUL</div>

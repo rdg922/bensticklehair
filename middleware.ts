@@ -40,11 +40,8 @@ export async function middleware(request: NextRequest) {
   // Allow access to home page, login, auth routes, API routes, and static files without authentication
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth") &&
-    !request.nextUrl.pathname.startsWith("/api") &&
-    request.nextUrl.pathname !== "/" &&
-    request.nextUrl.pathname !== "/favicon.ico"
+    (request.nextUrl.pathname.startsWith("/editor") ||
+      request.nextUrl.pathname.startsWith("/account"))
   ) {
     // Log for debugging
     console.log(

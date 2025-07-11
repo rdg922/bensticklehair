@@ -174,7 +174,7 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
           <img
             src={ben.image_data || "/placeholder.svg"}
             alt={ben.name}
-            className="border-4 border-white max-w-sm mx-auto shadow-lg"
+            className="border-4 border-white max-w-md w-full mx-auto shadow-lg"
           />
         </div>
       )}
