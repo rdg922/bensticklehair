@@ -37,14 +37,21 @@ export async function middleware(request: NextRequest) {
 
   const user = data?.user;
 
-  // Allow access to home page, login, auth routes, and static files without authentication
+  // Allow access to home page, login, auth routes, API routes, and static files without authentication
   if (
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/auth") &&
-    !request.nextUrl.pathname.startsWith("/callback") &&
-    request.nextUrl.pathname !== "/"
+    !request.nextUrl.pathname.startsWith("/api") &&
+    request.nextUrl.pathname !== "/" &&
+    request.nextUrl.pathname !== "/favicon.ico"
   ) {
+    // Log for debugging
+    console.log(
+      "Redirecting unauthenticated user from:",
+      request.nextUrl.pathname
+    );
+
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/login";

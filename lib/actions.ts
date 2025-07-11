@@ -7,22 +7,36 @@ import { createClient } from "@/lib/supabase-server";
 export async function signInWithGoogle() {
   const supabase = await createClient();
 
+  // Validate environment variables
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const redirectUrl = siteUrl
+    ? `${siteUrl}/auth/callback`
+    : "http://localhost:3000/auth/callback";
+
+  console.log("Sign in attempt with redirect URL:", redirectUrl);
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-      }/auth/callback`,
+      redirectTo: redirectUrl,
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent",
+      },
     },
   });
 
   if (error) {
-    console.error("Error:", error);
+    console.error("OAuth Error:", error);
     redirect("/auth/auth-code-error");
   }
 
   if (data.url) {
+    console.log("Redirecting to OAuth URL:", data.url);
     redirect(data.url);
+  } else {
+    console.error("No OAuth URL returned");
+    redirect("/auth/auth-code-error");
   }
 }
 
