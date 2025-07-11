@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Comic Sans MS";
+  src: url("/Comic Sans MS.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   background: linear-gradient(45deg, #000033, #000066, #003366, #000033);
   background-size: 400% 400%;
@@ -50,7 +58,7 @@ body::before {
 
 /* 3D Button Styles */
 .btn-3d {
-  font-family: "Comic Sans MS";
+  font-family: "Comic Sans MS", cursive;
   font-weight: bold;
   text-transform: uppercase;
   border: none;
@@ -188,7 +196,7 @@ body::before {
 /* Input styling */
 input,
 textarea {
-  font-family: "Comic Sans MS";
+  font-family: "Comic Sans MS", cursive;
   background: #ffe4e1;
   border: 3px solid;
   border-top-color: #fff0f5;
