@@ -318,16 +318,17 @@ export default function EditorPage() {
         <main>
           <div className="space-y-4">
             {/* MS Paint Style Toolbar */}
-            <div className="container-90s p-4">
-              <div className="flex flex-wrap items-center gap-4">
+            <div className="container-90s p-3 sm:p-4">
+              {/* Mobile-first responsive layout */}
+              <div className="space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
                 {/* Colors Section */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <span className="font-bold text-sm">COLORS:</span>
-                  <div className="flex gap-1">
+                  <div className="grid grid-cols-8 sm:flex gap-1">
                     {COLORS.map((color) => (
                       <button
                         key={color}
-                        className={`w-6 h-6 border-2 border-black ${
+                        className={`w-8 h-8 sm:w-6 sm:h-6 border-2 border-black touch-manipulation ${
                           selectedColor === color
                             ? "ring-2 ring-purple-500"
                             : ""
@@ -339,17 +340,26 @@ export default function EditorPage() {
                   </div>
                 </div>
 
-                {/* Divider */}
-                <div className="w-px h-8 bg-black"></div>
+                {/* Divider - hidden on mobile */}
+                <div className="hidden sm:block w-px h-8 bg-black"></div>
 
                 {/* Brush Size Section */}
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">BRUSH:</span>
-                  <div className="flex gap-1">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm">BRUSH:</span>
+                    <div
+                      className="rounded-full bg-black"
+                      style={{
+                        width: `${Math.max(brushSize / 2, 3)}px`,
+                        height: `${Math.max(brushSize / 2, 3)}px`,
+                      }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 sm:flex gap-1">
                     {BRUSH_SIZES.map((size) => (
                       <button
                         key={size}
-                        className={`btn-3d px-2 py-1 text-xs ${
+                        className={`btn-3d px-3 py-2 sm:px-2 sm:py-1 text-sm sm:text-xs touch-manipulation ${
                           brushSize === size ? "btn-primary" : "btn-secondary"
                         }`}
                         onClick={() => setBrushSize(size)}
@@ -358,57 +368,52 @@ export default function EditorPage() {
                       </button>
                     ))}
                   </div>
-                  <div
-                    className="rounded-full bg-black ml-2"
-                    style={{
-                      width: `${Math.max(brushSize / 2, 3)}px`,
-                      height: `${Math.max(brushSize / 2, 3)}px`,
-                    }}
-                  />
                 </div>
 
-                {/* Divider */}
-                <div className="w-px h-8 bg-black"></div>
+                {/* Divider - hidden on mobile */}
+                <div className="hidden sm:block w-px h-8 bg-black"></div>
 
                 {/* Tools Section */}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <span className="font-bold text-sm">TOOLS:</span>
-                  <button
-                    onClick={undo}
-                    className="btn-3d btn-secondary px-3 py-1 text-sm"
-                    disabled={historyStep <= 0}
-                  >
-                    UNDO
-                  </button>
-                  <button
-                    onClick={redo}
-                    className="btn-3d btn-secondary px-3 py-1 text-sm"
-                    disabled={historyStep >= history.length - 1}
-                  >
-                    REDO
-                  </button>
-                  <button
-                    onClick={clearCanvas}
-                    className="btn-3d btn-danger px-3 py-1 text-sm"
-                    disabled={isImageLoading}
-                  >
-                    {isImageLoading ? "LOADING..." : "CLEAR"}
-                  </button>
+                  <div className="grid grid-cols-3 sm:flex gap-2">
+                    <button
+                      onClick={undo}
+                      className="btn-3d btn-secondary px-3 py-2 sm:px-3 sm:py-1 text-sm touch-manipulation"
+                      disabled={historyStep <= 0}
+                    >
+                      UNDO
+                    </button>
+                    <button
+                      onClick={redo}
+                      className="btn-3d btn-secondary px-3 py-2 sm:px-3 sm:py-1 text-sm touch-manipulation"
+                      disabled={historyStep >= history.length - 1}
+                    >
+                      REDO
+                    </button>
+                    <button
+                      onClick={clearCanvas}
+                      className="btn-3d btn-danger px-3 py-2 sm:px-3 sm:py-1 text-sm touch-manipulation"
+                      disabled={isImageLoading}
+                    >
+                      {isImageLoading ? "LOADING..." : "CLEAR"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Canvas and Post Form */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <div className="container-pink p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+              <div className="xl:col-span-2">
+                <div className="container-pink p-3 sm:p-6">
                   <div className="flex justify-center">
-                    <div className="relative">
+                    <div className="relative w-full max-w-md">
                       <canvas
                         ref={canvasRef}
                         width={400}
                         height={500}
-                        className="cursor-crosshair border-4 border-black bg-white"
+                        className="cursor-crosshair border-4 border-black bg-white w-full h-auto"
                         style={{ touchAction: "none" }}
                         onMouseDown={startDrawing}
                         onMouseMove={draw}
@@ -423,7 +428,7 @@ export default function EditorPage() {
                         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 border-4 border-black">
                           <div className="text-center">
                             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-2"></div>
-                            <div className="font-bold text-lg">
+                            <div className="font-bold text-base lg:text-lg">
                               Loading Ben...
                             </div>
                           </div>
@@ -434,8 +439,8 @@ export default function EditorPage() {
                 </div>
               </div>
 
-              <div className="lg:col-span-1">
-                <div className="container-90s p-6">
+              <div className="xl:col-span-1">
+                <div className="container-90s p-4 sm:p-6">
                   <h3 className="text-lg font-bold mb-3 text-center">
                     POST YOUR BEN
                   </h3>
@@ -444,14 +449,14 @@ export default function EditorPage() {
                       type="text"
                       name="name"
                       placeholder="Name your Ben"
-                      className="w-full p-3 text-lg"
+                      className="w-full p-3 text-base lg:text-lg"
                       required
                     />
 
                     <textarea
                       name="birthdayMessage"
                       placeholder="Write a birthday message for Ben..."
-                      className="w-full p-3 text-lg resize-none"
+                      className="w-full p-3 text-base lg:text-lg resize-none"
                       rows={3}
                       required
                     />
@@ -459,7 +464,7 @@ export default function EditorPage() {
                     {benPostState &&
                       "error" in benPostState &&
                       benPostState.error && (
-                        <div className="text-red-500 font-bold">
+                        <div className="text-red-500 font-bold text-sm">
                           {benPostState.error}
                         </div>
                       )}
@@ -467,7 +472,7 @@ export default function EditorPage() {
                     <button
                       type="submit"
                       disabled={benPostPending}
-                      className="btn-3d btn-success w-full px-6 py-3 text-xl"
+                      className="btn-3d btn-success w-full px-6 py-3 text-lg lg:text-xl touch-manipulation"
                     >
                       {benPostPending ? "POSTING..." : "POST BEN"}
                     </button>
