@@ -315,6 +315,29 @@ export default function EditorPage() {
       <div className="max-w-6xl mx-auto p-4">
         <SiteHeader currentPage="editor" />
 
+        {/* Login Notice */}
+        {!user && (
+          <div className="bg-red-200 p-4 mb-4 border-4 border-red-600">
+            <div className="text-center">
+              <p className="text-xl font-bold text-red-800 mb-2 blink">
+                ⚠️ WARNING ⚠️
+              </p>
+              <p className="text-lg text-red-900 font-bold mb-2">
+                YOUR BEN WILL NOT BE SAVED!
+              </p>
+              <p className="text-sm text-red-700 mb-3">
+                You must sign in to upload and share your masterpiece
+              </p>
+              <a
+                href="/login"
+                className="btn-3d btn-primary px-4 py-2 text-sm inline-block"
+              >
+                SIGN IN NOW
+              </a>
+            </div>
+          </div>
+        )}
+
         <main>
           <div className="space-y-4">
             {/* MS Paint Style Toolbar */}
@@ -444,21 +467,37 @@ export default function EditorPage() {
                   <h3 className="text-lg font-bold mb-3 text-center">
                     POST YOUR BEN
                   </h3>
+                  
+                  {!user && (
+                    <div className="bg-yellow-200 p-3 mb-4 border-4 border-yellow-600">
+                      <div className="text-center">
+                        <p className="text-sm font-bold text-yellow-800 mb-2">
+                          🔒 ACCOUNT REQUIRED 🔒
+                        </p>
+                        <p className="text-xs text-yellow-700">
+                          Sign in to save and share your Ben masterpiece!
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
                   <form action={benPostAction} className="space-y-3">
                     <input
                       type="text"
                       name="name"
                       placeholder="Name your Ben"
-                      className="w-full p-3 text-base lg:text-lg"
+                      className={`w-full p-3 text-base lg:text-lg ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
                       required
+                      disabled={!user}
                     />
 
                     <textarea
                       name="birthdayMessage"
                       placeholder="Write a birthday message for Ben..."
-                      className="w-full p-3 text-base lg:text-lg resize-none"
+                      className={`w-full p-3 text-base lg:text-lg resize-none ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
                       rows={3}
                       required
+                      disabled={!user}
                     />
 
                     {benPostState &&
@@ -469,13 +508,22 @@ export default function EditorPage() {
                         </div>
                       )}
 
-                    <button
-                      type="submit"
-                      disabled={benPostPending}
-                      className="btn-3d btn-success w-full px-6 py-3 text-lg lg:text-xl touch-manipulation"
-                    >
-                      {benPostPending ? "POSTING..." : "POST BEN"}
-                    </button>
+                    {user ? (
+                      <button
+                        type="submit"
+                        disabled={benPostPending}
+                        className="btn-3d btn-success w-full px-6 py-3 text-lg lg:text-xl touch-manipulation"
+                      >
+                        {benPostPending ? "POSTING..." : "POST BEN"}
+                      </button>
+                    ) : (
+                      <a
+                        href="/login"
+                        className="btn-3d btn-primary w-full px-6 py-3 text-lg lg:text-xl touch-manipulation block text-center"
+                      >
+                        SIGN IN TO POST
+                      </a>
+                    )}
                   </form>
                 </div>
               </div>
