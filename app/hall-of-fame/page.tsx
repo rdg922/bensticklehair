@@ -291,7 +291,7 @@ export default function HallOfFamePage() {
                         {ben.birthday_message && (
                           <div className="mb-3 p-2 bg-yellow-200 border-l-4 border-yellow-500 rounded text-xs">
                             <p className="font-bold text-yellow-800 mb-1">
-                              🎂 BIRTHDAY MESSAGE:
+                              BIRTHDAY MESSAGE:
                             </p>
                             <p className="text-yellow-900">
                               {ben.birthday_message}

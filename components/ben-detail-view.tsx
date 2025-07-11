@@ -276,6 +276,14 @@ export function BenDetailView({
           />
         </div>
       )}
+      {ben.birthday_message && (
+        <div className="my-3 p-3 bg-yellow-200 border-l-4 border-yellow-500 rounded">
+          <p className="text-sm font-bold text-yellow-800 mb-1">
+            🎂 BIRTHDAY MESSAGE:
+          </p>
+          <p className="text-sm text-yellow-900">{ben.birthday_message}</p>
+        </div>
+      )}
 
       {/* Like button */}
       <div className="flex items-center gap-4 mb-6">

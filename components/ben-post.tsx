@@ -190,14 +190,6 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
         <p className="text-sm opacity-80">
           {new Date(ben.created_at).toLocaleDateString()}
         </p>
-        {ben.birthday_message && (
-          <div className="mt-3 p-3 bg-yellow-200 border-l-4 border-yellow-500 rounded">
-            <p className="text-sm font-bold text-yellow-800 mb-1">
-              🎂 BIRTHDAY MESSAGE:
-            </p>
-            <p className="text-sm text-yellow-900">{ben.birthday_message}</p>
-          </div>
-        )}
       </div>
 
       {ben.image_data && (
@@ -207,6 +199,14 @@ export function BenPost({ ben, userLikes = [], currentUserId }: BenPostProps) {
             alt={ben.name}
             className="border-4 border-white max-w-md w-full mx-auto shadow-lg"
           />
+        </div>
+      )}
+      {ben.birthday_message && (
+        <div className="my-3 p-3 bg-yellow-200 border-l-4 border-yellow-500 rounded">
+          <p className="text-sm font-bold text-yellow-800 mb-1">
+            🎂 BIRTHDAY MESSAGE:
+          </p>
+          <p className="text-sm text-yellow-900">{ben.birthday_message}</p>
         </div>
       )}
 
