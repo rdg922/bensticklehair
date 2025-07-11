@@ -33,6 +33,11 @@ CREATE TABLE IF NOT EXISTS ben_comments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create the 'bens' storage bucket for storing ben images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('bens', 'bens', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bens ENABLE ROW LEVEL SECURITY;
@@ -55,3 +60,21 @@ CREATE POLICY "Users can delete own likes" ON ben_likes FOR DELETE USING (auth.u
 CREATE POLICY "Anyone can view comments" ON ben_comments FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can comment" ON ben_comments FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "Users can delete own comments" ON ben_comments FOR DELETE USING (auth.uid() = user_id);
+
+-- Storage policies for the 'bens' bucket
+CREATE POLICY "Users can upload to own folder" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'bens' AND
+  auth.role() = 'authenticated' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);
+
+CREATE POLICY "Anyone can view ben images" ON storage.objects
+FOR SELECT USING (bucket_id = 'bens');
+
+CREATE POLICY "Users can delete own images" ON storage.objects
+FOR DELETE USING (
+  bucket_id = 'bens' AND
+  auth.role() = 'authenticated' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);

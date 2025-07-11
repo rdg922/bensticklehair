@@ -120,9 +120,56 @@ export async function createBenPost(formData: FormData) {
     return { error: "Birthday message must be 240 characters or less" };
   }
 
+  // Convert base64 data URL to blob for upload
+  let imageUrl: string;
+
+  try {
+    // Extract base64 data from data URL
+    const base64Data = imageData.split(",")[1];
+    const mimeType = imageData.split(",")[0].split(":")[1].split(";")[0];
+
+    // Convert base64 to blob
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
+
+    // Generate unique filename
+    const fileExtension = mimeType.split("/")[1] || "png";
+    const fileName = `${user.id}/${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}.${fileExtension}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("bens")
+      .upload(fileName, blob, {
+        contentType: mimeType,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Error uploading image:", uploadError);
+      return { error: "Failed to upload image" };
+    }
+
+    // Get public URL for the uploaded image
+    const { data: urlData } = supabase.storage
+      .from("bens")
+      .getPublicUrl(uploadData.path);
+
+    imageUrl = urlData.publicUrl;
+  } catch (error) {
+    console.error("Error processing image:", error);
+    return { error: "Failed to process image" };
+  }
+
   const { error } = await supabase.from("bens").insert({
     name: name.trim(),
-    image_data: imageData,
+    image_data: imageUrl,
     birthday_message: birthdayMessage.trim(),
     user_id: user.id,
   });
@@ -285,10 +332,10 @@ export async function deleteBenPost(benId: string) {
     return { error: "Must be logged in to delete posts" };
   }
 
-  // First check if the user owns this ben
+  // First check if the user owns this ben and get the image data
   const { data: ben, error: fetchError } = await supabase
     .from("bens")
-    .select("user_id")
+    .select("user_id, image_data")
     .eq("id", benId)
     .single();
 
@@ -311,6 +358,32 @@ export async function deleteBenPost(benId: string) {
   if (error) {
     console.error("Error deleting ben post:", error);
     return { error: "Failed to delete ben post" };
+  }
+
+  // If the image is stored in Supabase Storage, try to delete it
+  if (
+    ben.image_data &&
+    ben.image_data.includes("/storage/v1/object/public/bens/")
+  ) {
+    try {
+      // Extract the file path from the public URL
+      const urlParts = ben.image_data.split("/storage/v1/object/public/bens/");
+      if (urlParts.length > 1) {
+        const filePath = urlParts[1];
+
+        const { error: deleteError } = await supabase.storage
+          .from("bens")
+          .remove([filePath]);
+
+        if (deleteError) {
+          console.warn("Failed to delete image from storage:", deleteError);
+          // Don't return error here as the ben post was already deleted
+        }
+      }
+    } catch (storageError) {
+      console.warn("Error deleting image from storage:", storageError);
+      // Don't return error here as the ben post was already deleted
+    }
   }
 
   // Add a small delay to ensure database changes are committed

@@ -11,6 +11,7 @@ A fun, 90s-themed web application for drawing and sharing "Ben" artwork with a r
 - 📱 **Responsive Design**: Works on desktop and mobile
 - ⚡ **Server Actions**: Modern Next.js 15 with server-side form handling
 - 🌈 **90s Aesthetic**: Retro styling with rainbow text and classic web vibes
+- 📁 **Supabase Storage**: Images are stored in Supabase Storage for better performance and scalability
 
 ## Tech Stack
 
@@ -51,72 +52,7 @@ yarn install
 
 ### 4. Database Setup
 
-Run the following SQL in your Supabase SQL Editor:
-
-\`\`\`sql
--- Create users table
-CREATE TABLE users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create bens table
-CREATE TABLE bens (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  image_data TEXT NOT NULL,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create ben_likes table
-CREATE TABLE ben_likes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  ben_id UUID REFERENCES bens(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(ben_id, user_id)
-);
-
--- Create ben_comments table
-CREATE TABLE ben_comments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  ben_id UUID REFERENCES bens(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Enable Row Level Security
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bens ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ben_likes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ben_comments ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies
--- Users can read all profiles, but only update their own
-CREATE POLICY "Users can view all profiles" ON users FOR SELECT USING (true);
-CREATE POLICY "Users can update own profile" ON users FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile" ON users FOR INSERT WITH CHECK (auth.uid() = id);
-
--- Bens are publicly readable, but users can only create their own
-CREATE POLICY "Bens are publicly readable" ON bens FOR SELECT USING (true);
-CREATE POLICY "Users can create own bens" ON bens FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own bens" ON bens FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own bens" ON bens FOR DELETE USING (auth.uid() = user_id);
-
--- Likes are publicly readable, users can like any ben but only manage their own likes
-CREATE POLICY "Likes are publicly readable" ON ben_likes FOR SELECT USING (true);
-CREATE POLICY "Users can create likes" ON ben_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can delete own likes" ON ben_likes FOR DELETE USING (auth.uid() = user_id);
-
--- Comments are publicly readable, users can comment on any ben but only manage their own comments
-CREATE POLICY "Comments are publicly readable" ON ben_comments FOR SELECT USING (true);
-CREATE POLICY "Users can create comments" ON ben_comments FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own comments" ON ben_comments FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own comments" ON ben_comments FOR DELETE USING (auth.uid() = user_id);
-\`\`\`
+Run the SQL commands in \`scripts/create-tables.sql\` in your Supabase SQL Editor to set up all tables and storage:
 
 ### 5. Environment Variables
 
@@ -157,6 +93,23 @@ yarn dev
 \`\`\`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+## Image Storage Migration
+
+The application has been updated to use Supabase Storage instead of storing base64 image data directly in the database. This provides better performance and scalability.
+
+### What Changed:
+- Images are now uploaded to a "bens" storage bucket in Supabase
+- The `image_data` column now stores public URLs instead of base64 data
+- Backward compatibility is maintained for existing base64 images
+- When deleting a ben post, the associated image file is also removed from storage
+
+### For Existing Installations:
+If you have existing ben posts with base64 image data, they will continue to work. New posts will automatically use the storage system.
+
+The system gracefully handles both formats:
+- Legacy base64 data URLs (starts with `data:`)
+- New Supabase Storage URLs (full HTTPS URLs)
 
 ## Deployment
 
