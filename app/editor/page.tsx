@@ -43,6 +43,7 @@ export default function EditorPage() {
   const [history, setHistory] = useState<ImageData[]>([]);
   const [historyStep, setHistoryStep] = useState(-1);
   const [user, setUser] = useState<any>(null);
+  const [userLoaded, setUserLoaded] = useState(false);
   const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function EditorPage() {
       data: { user },
     } = await supabase.auth.getUser();
     setUser(user);
+    setUserLoaded(true);
   };
 
   const initializeCanvas = () => {
@@ -316,7 +318,7 @@ export default function EditorPage() {
         <SiteHeader currentPage="editor" />
 
         {/* Login Notice */}
-        {!user && (
+        {userLoaded && !user && (
           <div className="bg-red-200 p-4 mb-4 border-4 border-red-600">
             <div className="text-center">
               <p className="text-xl font-bold text-red-800 mb-2 blink">
@@ -467,8 +469,8 @@ export default function EditorPage() {
                   <h3 className="text-lg font-bold mb-3 text-center">
                     POST YOUR BEN
                   </h3>
-                  
-                  {!user && (
+
+                  {userLoaded && !user && (
                     <div className="bg-yellow-200 p-3 mb-4 border-4 border-yellow-600">
                       <div className="text-center">
                         <p className="text-sm font-bold text-yellow-800 mb-2">
@@ -480,13 +482,15 @@ export default function EditorPage() {
                       </div>
                     </div>
                   )}
-                  
+
                   <form action={benPostAction} className="space-y-3">
                     <input
                       type="text"
                       name="name"
                       placeholder="Name your Ben"
-                      className={`w-full p-3 text-base lg:text-lg ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full p-3 text-base lg:text-lg ${
+                        !user ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                       required
                       disabled={!user}
                     />
@@ -494,7 +498,9 @@ export default function EditorPage() {
                     <textarea
                       name="birthdayMessage"
                       placeholder="Write a birthday message for Ben..."
-                      className={`w-full p-3 text-base lg:text-lg resize-none ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`w-full p-3 text-base lg:text-lg resize-none ${
+                        !user ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                       rows={3}
                       required
                       disabled={!user}
