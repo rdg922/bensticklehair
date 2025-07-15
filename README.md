@@ -1,6 +1,6 @@
 # benjaminstick.hair
 
-A fun, 90s-themed web application for drawing and sharing "Ben" artwork with a retro aesthetic! 
+A fun, 90s-themed social media application designed for solely drawing and sharing "Ben" artwork with a retro aesthetic! 
 
 ## Features
 
