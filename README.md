@@ -1,4 +1,4 @@
-# benjaminstick.hair
+# benjaminstickle.hair
 
 A fun, 90s-themed social media application designed for solely drawing and sharing "Ben" artwork with a retro aesthetic! 
 
